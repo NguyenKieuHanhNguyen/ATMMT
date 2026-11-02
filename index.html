@@ -2930,87 +2930,35 @@
       init();
     }
   </script>
-<!-- FIX MOBILE & MODAL TƯƠNG TÁC -->
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
+  /* Cho phép trang cuộn nội dung tự nhiên */
   html, body {
-    overflow-x: hidden !important;
     overflow-y: auto !important;
     height: auto !important;
-    min-height: 100% !important;
   }
 
-  /* Đảm bảo danh mục chương nằm ở tầng hiển thị cơ bản, không nổi đè lên popup */
-  aside, .sidebar, [class*="sidebar"] {
-    position: relative !important;
-    z-index: 10 !important;
-    max-height: 220px !important;
-    overflow-y: auto !important;
+  /* Đảm bảo modal popup luôn nổi trên cùng và không bị chữ bên dưới đè lên */
+  div[class*="modal"], div[class*="popup"], div[id*="modal"] {
+    z-index: 999999 !important;
   }
 
-  /* Khung chứa Modal / Popup toàn màn hình */
-  #modal, #testModal, [class*="modal"], [class*="popup"], [class*="dialog"] {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100vw !important;
-    height: 100vh !important;
-    z-index: 99999 !important;
-    background-color: rgba(0, 0, 0, 0.6) !important;
-    display: none;
-    align-items: center !important;
-    justify-content: center !important;
-  }
-
-  /* Khi modal mở: hiện flex căn giữa */
-  #modal.active, #modal.show, [class*="modal"].active, [class*="modal"].show, [style*="display: block"], [style*="display: flex"] {
-    display: flex !important;
-  }
-
-  /* Hộp nội dung màu trắng của popup: luôn có nền đặc, nổi bật và nằm trên cùng */
-  [class*="modal-content"], [class*="popup-content"], [class*="dialog-content"], .modal-box {
-    background: #ffffff !important;
-    color: #1f2937 !important;
-    border-radius: 16px !important;
-    padding: 24px 20px !important;
-    width: 90% !important;
-    max-width: 360px !important;
-    position: relative !important;
-    z-index: 100000 !important;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3) !important;
-  }
-
-  /* Đảm bảo 2 nút bấm luôn nằm trên cùng và nhận sự kiện chạm tay */
-  [class*="modal"] button, [class*="popup"] button, button {
-    cursor: pointer !important;
+  /* Nút bấm luôn nhận cảm ứng từ tay trên màn hình điện thoại */
+  button {
     touch-action: manipulation !important;
-    pointer-events: auto !important;
-    position: relative !important;
-    z-index: 100001 !important;
+    cursor: pointer !important;
+  }
+
+  /* Tối ưu riêng cho màn hình di động mà không can thiệp vào cơ chế ẩn hiện modal */
+  @media screen and (max-width: 900px) {
+    aside, .sidebar {
+      position: relative !important;
+      max-height: 200px !important;
+      overflow-y: auto !important;
+      z-index: 1 !important;
+    }
   }
 </style>
-
-<script>
-  // Bắt trực tiếp sự kiện chạm cho nút Hủy và Bắt đầu thi trên mobile
-  document.addEventListener("DOMContentLoaded", function() {
-    function bindMobileButtons() {
-      const allButtons = document.querySelectorAll("button");
-      allButtons.forEach(btn => {
-        const text = btn.innerText.trim();
-        if (text.includes("Hủy") || text.includes("Bắt đầu") || text.includes("Thi Thử")) {
-          btn.style.pointerEvents = "auto";
-          btn.addEventListener("touchend", function(e) {
-            e.preventDefault();
-            btn.click();
-          });
-        }
-      });
-    }
-
-    bindMobileButtons();
-    setTimeout(bindMobileButtons, 1000);
-  });
-</script>
 </body>
 </html>
