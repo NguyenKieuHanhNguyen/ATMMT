@@ -2930,90 +2930,86 @@
       init();
     }
   </script>
-  <!-- BẮT ĐẦU PATCH MOBILE RESPONSIVE CHO ATMMT MASTER HUB -->
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+<!-- FIX MOBILE & MODAL TƯƠNG TÁC -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
 <style>
-  /* Cho phép toàn bộ trang cuộn tự do */
   html, body {
+    overflow-x: hidden !important;
     overflow-y: auto !important;
     height: auto !important;
     min-height: 100% !important;
   }
 
-  @media screen and (max-width: 900px) {
-    /* Đảm bảo tất cả các khối nội dung không bị ẩn */
-    div, section, main, article {
-      max-height: none !important;
-    }
-
-    /* Đổi layout 2 cột thành 1 cột xếp chồng */
-    body > div, #app, .app, .wrapper, .main {
-      display: block !important;
-      height: auto !important;
-    }
-
-    /* Đưa thanh danh mục chương lên trên với chiều cao vừa phải và có thanh cuộn riêng */
-    aside, .sidebar {
-      display: block !important;
-      position: static !important;
-      width: 100% !important;
-      max-height: 220px !important;
-      overflow-y: auto !important;
-      margin-bottom: 16px !important;
-    }
-
-    /* Đảm bảo vùng câu hỏi trắc nghiệm luôn hiển thị rõ ràng */
-    main, .main-content, .content, .quiz-container {
-      display: block !important;
-      visibility: visible !important;
-      opacity: 1 !important;
-      width: 100% !important;
-      position: static !important;
-      height: auto !important;
-      min-height: 300px !important;
-    }
-
-    /* Nút bấm câu hỏi và đáp án vừa vặn với ngón tay */
-    button {
-      min-height: 44px !important;
-    }
+  /* Đảm bảo danh mục chương nằm ở tầng hiển thị cơ bản, không nổi đè lên popup */
+  aside, .sidebar, [class*="sidebar"] {
+    position: relative !important;
+    z-index: 10 !important;
+    max-height: 220px !important;
+    overflow-y: auto !important;
   }
-  /* Đảm bảo khung popup và các nút bên trong luôn nằm trên cùng và nhận chạm */
-[class*="modal"], [class*="popup"], [class*="dialog"] {
-  z-index: 999999 !important;
-  pointer-events: auto !important;
-}
 
-/* Đảm bảo toàn bộ nút bấm trong modal/popup luôn ăn cảm ứng trên màn hình cảm ứng */
-[class*="modal"] button, 
-[class*="popup"] button, 
-[class*="dialog"] button,
-button {
-  position: relative !important;
-  z-index: 1000000 !important;
-  pointer-events: auto !important;
-  touch-action: manipulation !important;
-  cursor: pointer !important;
-  -webkit-tap-highlight-color: rgba(0,0,0,0.1);
-}
+  /* Khung chứa Modal / Popup toàn màn hình */
+  #modal, #testModal, [class*="modal"], [class*="popup"], [class*="dialog"] {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 99999 !important;
+    background-color: rgba(0, 0, 0, 0.6) !important;
+    display: none;
+    align-items: center !important;
+    justify-content: center !important;
+  }
 
-/* Lớp phủ mờ nền không được chặn click vào nút */
-[class*="overlay"], [class*="backdrop"] {
-  z-index: 999990 !important;
-}
+  /* Khi modal mở: hiện flex căn giữa */
+  #modal.active, #modal.show, [class*="modal"].active, [class*="modal"].show, [style*="display: block"], [style*="display: flex"] {
+    display: flex !important;
+  }
+
+  /* Hộp nội dung màu trắng của popup: luôn có nền đặc, nổi bật và nằm trên cùng */
+  [class*="modal-content"], [class*="popup-content"], [class*="dialog-content"], .modal-box {
+    background: #ffffff !important;
+    color: #1f2937 !important;
+    border-radius: 16px !important;
+    padding: 24px 20px !important;
+    width: 90% !important;
+    max-width: 360px !important;
+    position: relative !important;
+    z-index: 100000 !important;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3) !important;
+  }
+
+  /* Đảm bảo 2 nút bấm luôn nằm trên cùng và nhận sự kiện chạm tay */
+  [class*="modal"] button, [class*="popup"] button, button {
+    cursor: pointer !important;
+    touch-action: manipulation !important;
+    pointer-events: auto !important;
+    position: relative !important;
+    z-index: 100001 !important;
+  }
 </style>
-<!-- KẾT THÚC PATCH MOBILE RESPONSIVE -->
-  <script>
-  // Kích hoạt nhận diện click/touch trên iOS cho các nút trong popup
-  document.addEventListener('DOMContentLoaded', function() {
-    const buttons = document.querySelectorAll('button, [role="button"]');
-    buttons.forEach(btn => {
-      btn.addEventListener('touchend', function(e) {
-        // Kích hoạt sự kiện click nếu trình duyệt di động nuốt touch
-        this.click();
-      }, { passive: true });
-    });
+
+<script>
+  // Bắt trực tiếp sự kiện chạm cho nút Hủy và Bắt đầu thi trên mobile
+  document.addEventListener("DOMContentLoaded", function() {
+    function bindMobileButtons() {
+      const allButtons = document.querySelectorAll("button");
+      allButtons.forEach(btn => {
+        const text = btn.innerText.trim();
+        if (text.includes("Hủy") || text.includes("Bắt đầu") || text.includes("Thi Thử")) {
+          btn.style.pointerEvents = "auto";
+          btn.addEventListener("touchend", function(e) {
+            e.preventDefault();
+            btn.click();
+          });
+        }
+      });
+    }
+
+    bindMobileButtons();
+    setTimeout(bindMobileButtons, 1000);
   });
 </script>
 </body>
