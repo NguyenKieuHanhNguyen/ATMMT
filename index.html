@@ -440,12 +440,13 @@
     
     <div style="display:flex; gap:10px; align-items:center;">
       <!-- Nút mở Popup Thi thử -->
-      <button type="button" 
-              onclick="openTestModal()" 
-              ontouchend="openTestModal()"
-              style="padding:9px 15px; border-radius:8px; border:none; background:linear-gradient(135deg, #2563eb, #7c3aed); color:#fff; font-weight:600; font-size:0.9rem; cursor:pointer; touch-action:manipulation; -webkit-tap-highlight-color:transparent;">
-        ⚡ Thi Thử Ngẫu Nhiên 40 Câu
-      </button>
+<button type="button" 
+        class="btn btn-primary" 
+        onclick="loc40CauNgauNhien()" 
+        ontouchend="loc40CauNgauNhien()"
+        style="padding:9px 15px; border-radius:8px; border:none; background:linear-gradient(135deg, #2563eb, #7c3aed); color:#fff; font-weight:600; font-size:0.9rem; cursor:pointer; touch-action:manipulation;">
+  ⚡ Lấy 40 Câu Ngẫu Nhiên
+</button>
 
       <!-- Nút Giao diện Sáng/Tối -->
       <button type="button" 
@@ -3092,6 +3093,52 @@
       themeBtn.innerHTML = savedTheme === 'light' ? '☀️ Giao diện' : '🌙 Giao diện';
     }
   })();
+   function loc40CauNgauNhien() {
+  // 1. Tìm danh sách câu hỏi gốc từ các biến phổ biến trong mã nguồn
+  let danhSachGoc = null;
+  if (typeof questions !== 'undefined' && Array.isArray(questions)) danhSachGoc = questions;
+  else if (typeof allQuestions !== 'undefined' && Array.isArray(allQuestions)) danhSachGoc = allQuestions;
+  else if (typeof rawQuestions !== 'undefined' && Array.isArray(rawQuestions)) danhSachGoc = rawQuestions;
+  else if (typeof quizData !== 'undefined' && Array.isArray(quizData)) danhSachGoc = quizData;
+  else if (typeof DATA !== 'undefined' && Array.isArray(DATA)) danhSachGoc = DATA;
+
+  if (danhSachGoc && danhSachGoc.length > 0) {
+    // Trộn ngẫu nhiên (Fisher-Yates) và lấy đúng 40 câu
+    const de40Cau = [...danhSachGoc].sort(() => 0.5 - Math.random()).slice(0, 40);
+
+    // Render lại danh sách câu hỏi ra màn hình
+    if (typeof currentQuestions !== 'undefined') currentQuestions = de40Cau;
+    if (typeof filteredQuestions !== 'undefined') filteredQuestions = de40Cau;
+
+    if (typeof renderQuestions === 'function') renderQuestions(de40Cau);
+    else if (typeof displayQuestions === 'function') displayQuestions(de40Cau);
+    else if (typeof renderList === 'function') renderList(de40Cau);
+    else if (typeof showQuestions === 'function') showQuestions(de40Cau);
+
+    // Cập nhật số lượng câu hiển thị trên giao diện (nếu có thẻ đếm)
+    const countBadge = document.querySelector('[class*="count"], #questionCount, strong');
+    if (countBadge && countBadge.innerText.includes('263')) {
+      countBadge.innerText = '40 câu hỏi';
+    }
+
+    // Cuộn mượt xuống câu hỏi đầu tiên
+    window.scrollTo({ top: 120, behavior: 'smooth' });
+    return;
+  }
+
+  // 2. Dự phòng: Nếu giao diện render trực tiếp bằng thẻ HTML (.question-card / .quiz-item)
+  const cards = Array.from(document.querySelectorAll('.question-card, .quiz-card, [class*="question"]'));
+  if (cards.length > 0) {
+    // Ẩn tất cả câu hỏi trước
+    cards.forEach(card => card.style.display = 'none');
+
+    // Chọn ngẫu nhiên 40 thẻ để hiển thị
+    const randomCards = cards.sort(() => 0.5 - Math.random()).slice(0, 40);
+    randomCards.forEach(card => card.style.display = 'block');
+
+    window.scrollTo({ top: 120, behavior: 'smooth' });
+  }
+}
 </script>
 </body>
 </html>
