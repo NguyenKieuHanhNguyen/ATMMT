@@ -3025,43 +3025,21 @@
   }
 
   // 3. Xử lý nút "Bắt đầu thi ngay" (Lấy ngẫu nhiên 40 câu)
-  function startExamFromModal() {
-    closeTestModal();
+ function startExamFromModal() {
+  closeTestModal();
 
-    // Tìm mảng chứa toàn bộ câu hỏi gốc
-    let allQ = [];
-    if (typeof questions !== 'undefined' && Array.isArray(questions)) {
-      allQ = questions;
-    } else if (typeof allQuestions !== 'undefined' && Array.isArray(allQuestions)) {
-      allQ = allQuestions;
-    } else if (typeof quizData !== 'undefined' && Array.isArray(quizData)) {
-      allQ = quizData;
-    }
-
-    // Nếu tìm thấy danh sách câu hỏi, trộn ngẫu nhiên và lấy đúng 40 câu
-    if (allQ.length > 0) {
-      const exam40 = [...allQ].sort(() => 0.5 - Math.random()).slice(0, 40);
-
-      if (typeof renderQuestions === 'function') {
-        renderQuestions(exam40);
-      } else if (typeof displayQuestions === 'function') {
-        displayQuestions(exam40);
-      } else if (typeof startExam === 'function') {
-        startExam(exam40);
-      } else if (typeof startTest === 'function') {
-        startTest(exam40);
-      }
-      
-      // Cuộn trang mượt mà xuống phần bắt đầu câu hỏi
-      window.scrollTo({ top: 100, behavior: 'smooth' });
-    } else {
-      // Trường hợp hệ thống dùng hàm nội bộ có sẵn
-      if (typeof startExam === 'function') startExam();
-      else if (typeof startTest === 'function') startTest();
-      else if (typeof generateExam === 'function') generateExam();
-      else if (typeof initExam === 'function') initExam();
-    }
+  // 1. Kiểm tra nếu hàm gốc startExam có sẵn
+  if (typeof startExam === 'function') {
+    startExam();
+    return;
   }
+
+  // 2. Nếu hàm gốc tên là startMockExam hoặc startQuiz
+  if (typeof startMockExam === 'function') {
+    startMockExam();
+    return;
+  }
+}
 
   // 4. Bật / Tắt Giao diện Sáng - Tối và lưu lại vào máy
   function toggleTheme() {
