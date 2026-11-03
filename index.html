@@ -2904,7 +2904,7 @@
       examActive = true;
 
       const shuffled = [...database].sort(() => 0.5 - Math.random());
-      examQuestions = shuffled.slice(0, 50);
+      examQuestions = shuffled.slice(0, 40);
 
       document.getElementById('examBanner').style.display = 'flex';
       window.scrollTo({ top: 0, behavior: 'smooth' });
